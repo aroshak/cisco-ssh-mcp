@@ -12,3 +12,22 @@ coverage/
 *.swp
 *.swo
 *~
+
+# Setup and temporary files
+setup-*.bat
+setup-*.sh
+setup-package.json
+commit-fixes.bat
+manual-github-setup.bat
+quick-setup.bat
+
+# Smithery files
+.smithery/
+smithery.json
+
+# Documentation that's no longer needed
+GITHUB_FIX.md
+GIT_SETUP.md
+
+# Build artifacts
+*.tsbuildinfo

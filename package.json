@@ -1,6 +1,6 @@
 {
   "name": "cisco-ssh-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for SSH connections to Cisco network devices",
   "main": "dist/index.js",
   "type": "module",
@@ -38,10 +38,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/arosha/cisco-ssh-mcp.git"
+    "url": "https://github.com/aroshak/cisco-ssh-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/arosha/cisco-ssh-mcp/issues"
+    "url": "https://github.com/aroshak/cisco-ssh-mcp/issues"
   },
-  "homepage": "https://github.com/arosha/cisco-ssh-mcp#readme"
+  "homepage": "https://github.com/aroshak/cisco-ssh-mcp#readme"
 }

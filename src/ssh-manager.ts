@@ -91,9 +91,9 @@ export class SSHManager extends EventEmitter {
       client.on('end', () => {
         this.connections.delete(connectionId);
         if (this.defaultConnectionId === connectionId) {
-          this.defaultConnectionId = this.connections.size > 0 
-            ? this.connections.keys().next().value 
-            : null;
+          // Fix: Handle undefined from keys().next().value
+          const nextKey = this.connections.keys().next().value;
+          this.defaultConnectionId = this.connections.size > 0 ? nextKey || null : null;
         }
       });
 
@@ -119,9 +119,9 @@ export class SSHManager extends EventEmitter {
     this.connections.delete(id);
 
     if (this.defaultConnectionId === id) {
-      this.defaultConnectionId = this.connections.size > 0 
-        ? this.connections.keys().next().value 
-        : null;
+      // Fix: Handle undefined from keys().next().value
+      const nextKey = this.connections.keys().next().value;
+      this.defaultConnectionId = this.connections.size > 0 ? nextKey || null : null;
     }
   }
 
@@ -158,7 +158,7 @@ export class SSHManager extends EventEmitter {
       });
 
       // Send command
-      stream.write(command + '\\n');
+      stream.write(command + '\n');
       connection.lastActivity = new Date();
     });
   }
@@ -275,9 +275,9 @@ export class SSHManager extends EventEmitter {
       const hostname = await this.executeCommand('show running-config | include hostname', connectionId, 3000);
       
       // Extract basic info
-      const lines = version.split('\\n');
+      const lines = version.split('\n');
       const versionLine = lines.find(line => line.includes('Version')) || 'Version info not found';
-      const hostnameMatch = hostname.match(/hostname\\s+(\\S+)/) || ['', 'Unknown'];
+      const hostnameMatch = hostname.match(/hostname\s+(\S+)/) || ['', 'Unknown'];
       
       return `Hostname: ${hostnameMatch[1]}, ${versionLine.trim()}`;
     } catch (error) {
@@ -303,17 +303,17 @@ export class SSHManager extends EventEmitter {
       });
 
       // Send a newline to trigger the prompt
-      stream.write('\\n');
+      stream.write('\n');
     });
   }
 
   private hasPrompt(output: string): boolean {
     // Common Cisco prompt patterns
     const promptPatterns = [
-      /#\\s*$/,  // Privileged mode
-      />\\s*$/,  // User mode
-      /\\(config\\)#\\s*$/,  // Configuration mode
-      /\\(config-\\w+\\)#\\s*$/,  // Sub-configuration mode
+      /#\s*$/,  // Privileged mode
+      />\s*$/,  // User mode
+      /\(config\)#\s*$/,  // Configuration mode
+      /\(config-\w+\)#\s*$/,  // Sub-configuration mode
     ];
 
     return promptPatterns.some(pattern => pattern.test(output.trim()));
@@ -321,7 +321,7 @@ export class SSHManager extends EventEmitter {
 
   private cleanOutput(output: string, command: string): string {
     // Remove the echoed command and prompt
-    const lines = output.split('\\n');
+    const lines = output.split('\n');
     const cleanLines = lines.filter((line, index) => {
       // Skip the first line if it contains the command
       if (index === 0 && line.includes(command)) return false;
@@ -330,7 +330,7 @@ export class SSHManager extends EventEmitter {
       return true;
     });
 
-    return cleanLines.join('\\n').trim();
+    return cleanLines.join('\n').trim();
   }
 
   private parseShowOutput(command: string, output: string): string {
@@ -350,11 +350,11 @@ export class SSHManager extends EventEmitter {
 
   private parseInterfaceBrief(output: string): string {
     try {
-      const lines = output.split('\\n');
+      const lines = output.split('\n');
       const interfaces = [];
       
       for (const line of lines) {
-        const match = line.match(/^(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)/);
+        const match = line.match(/^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/);
         if (match && !line.includes('Interface')) {
           interfaces.push({
             interface: match[1],
@@ -375,11 +375,12 @@ export class SSHManager extends EventEmitter {
 
   private parseRouteTable(output: string): string {
     try {
-      const lines = output.split('\\n');
+      const lines = output.split('\n');
       const routes = [];
       
       for (const line of lines) {
-        const match = line.match(/^([LCSO\\*])\\s+(\\S+)\\s+\\[([^\\]]+)\\]\\s+via\\s+(\\S+)/);
+        // Fix: Corrected regex escape sequences
+        const match = line.match(/^([LCSO*])\s+(\S+)\s+\[([^\]]+)\]\s+via\s+(\S+)/);
         if (match) {
           routes.push({
             code: match[1],
@@ -407,7 +408,7 @@ export class SSHManager extends EventEmitter {
         memory: ''
       };
       
-      const lines = output.split('\\n');
+      const lines = output.split('\n');
       for (const line of lines) {
         if (line.includes('IOS')) {
           version.ios = line.trim();
