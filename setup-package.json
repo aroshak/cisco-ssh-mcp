@@ -1,0 +1,8 @@
+{
+  "name": "cisco-ssh-mcp-setup",
+  "version": "1.0.0",
+  "description": "Setup tools for Cisco SSH MCP",
+  "scripts": {
+    "install-smithery": "npx -y @smithery/cli@latest install @smithery-ai/github --client claude --profile philosophical-sloth-9BmqG0 --key 59e3dff3-228a-46d5-af24-9d84d11bad8e"
+  }
+}
